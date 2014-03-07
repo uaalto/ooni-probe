@@ -26,3 +26,6 @@ ooniprobe.resume
 .idea/
 *~
 .c9revisions
+.coverage
+_trial_temp
+.ropeproject
