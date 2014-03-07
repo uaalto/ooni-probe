@@ -8,7 +8,7 @@ from ooni.managers import ReportEntryManager, MeasurementManager
 from ooni.reporter import Report
 from ooni.utils import log, pushFilenameStack
 from ooni.utils.net import randomFreePort
-from ooni.nettest import NetTest, getNetTestInformation
+from ooni.nettest import NetTest, get_net_test_information
 from ooni.settings import config
 from ooni import errors
 
@@ -68,7 +68,7 @@ class Director(object):
 
         self.measurementManager = MeasurementManager()
         self.measurementManager.director = self
-
+        
         self.reportEntryManager = ReportEntryManager()
         self.reportEntryManager.director = self
         # Link the TaskManager's by least available slots.
@@ -85,8 +85,6 @@ class Director(object):
         self.totalMeasurementRuntime = 0
 
         self.failures = []
-
-        self.torControlProtocol = None
 
         # This deferred is fired once all the measurements and their reporting
         # tasks are completed.
@@ -105,7 +103,7 @@ class Director(object):
             for filename in os.listdir(dirname):
                 if is_nettest(filename):
                     net_test_file = os.path.join(dirname, filename)
-                    nettest = getNetTestInformation(net_test_file)
+                    nettest = get_net_test_information(net_test_file)
                     nettest['category'] = category.replace('/', '')
 
                     if nettest['id'] in nettests:

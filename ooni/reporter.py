@@ -137,24 +137,6 @@ class OReporter(object):
     def finish(self):
         pass
 
-    def testDone(self, test, test_name):
-        # XXX put this inside of Report.close
-        # or perhaps put something like this inside of netTestDone
-        log.msg("Finished running %s" % test_name)
-        test_report = dict(test.report)
-
-        if isinstance(test.input, Packet):
-            test_input = createPacketReport(test.input)
-        else:
-            test_input = test.input
-
-        test_report['input'] = test_input
-        test_report['test_name'] = test_name
-        test_report['test_started'] = test._start_time
-        test_report['test_runtime'] = time.time() - test._start_time
-
-        return defer.maybeDeferred(self.writeReportEntry, test_report)
-
 class InvalidDestination(ReporterException):
     pass
 
@@ -323,6 +305,7 @@ class OONIBReporter(OReporter):
             'probe_asn': self.testDetails['probe_asn'],
             'test_name': self.testDetails['test_name'],
             'test_version': self.testDetails['test_version'],
+            'data_format_version': self.testDetails['data_format_version'],
             'input_hashes': self.testDetails['input_hashes'],
             # XXX there is a bunch of redundancy in the arguments getting sent
             # to the backend. This may need to get changed in the client and the

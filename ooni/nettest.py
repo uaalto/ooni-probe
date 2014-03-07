@@ -7,7 +7,7 @@ from twisted.internet import defer, reactor
 from twisted.trial.runner import filenameToModule
 from twisted.python import usage, reflect
 
-from ooni import geoip
+from ooni import geoip, data_format_version
 from ooni.tasks import Measurement
 from ooni.utils import log, checkForRoot
 from ooni import otime
@@ -38,45 +38,7 @@ def get_test_methods(item, method_prefix="test_"):
         pass
     return test_cases
 
-def loadNetTestString(net_test_string):
-    """
-    Load NetTest from a string.
-    WARNING input to this function *MUST* be sanitized and *NEVER* be
-    untrusted.
-    Failure to do so will result in code exec.
-
-    net_test_string:
-
-        a string that contains the net test to be run.
-    """
-    net_test_file_object = StringIO(net_test_string)
-
-    ns = {}
-    test_cases = []
-    exec net_test_file_object.read() in ns
-    for item in ns.itervalues():
-        test_cases.extend(get_test_methods(item))
-
-    if not test_cases:
-        raise e.NoTestCasesFound
-
-    return test_cases
-
-def loadNetTestFile(net_test_file):
-    """
-    Load NetTest from a file.
-    """
-    test_cases = []
-    module = filenameToModule(net_test_file)
-    for __, item in getmembers(module):
-        test_cases.extend(get_test_methods(item))
-
-    if not test_cases:
-        raise e.NoTestCasesFound
-
-    return test_cases
-
-def getTestClassFromFile(net_test_file):
+def get_test_class_from_file(net_test_file):
     """
     Will return the first class that is an instance of NetTestCase.
 
@@ -91,7 +53,7 @@ def getTestClassFromFile(net_test_file):
         except (TypeError, AssertionError):
             pass
 
-def getOption(opt_parameter, required_options, type='text'):
+def get_option(opt_parameter, required_options, type='text'):
     """
     Arguments:
         usage_options: a list as should be the optParameters of an UsageOptions class.
@@ -121,11 +83,11 @@ def getOption(opt_parameter, required_options, type='text'):
         'type': type
     }
 
-def getArguments(test_class):
+def get_arguments(test_class):
     arguments = {}
     if test_class.inputFile:
         option_name = test_class.inputFile[0]
-        arguments[option_name] = getOption(test_class.inputFile,
+        arguments[option_name] = get_option(test_class.inputFile,
                 test_class.requiredOptions, type='file')
     try:
         list(test_class.usageOptions.optParameters)
@@ -137,7 +99,7 @@ def getArguments(test_class):
         opt_type="text"
         if opt_parameter[3].lower().startswith("file"):
             opt_type="file"
-        arguments[option_name] = getOption(opt_parameter,
+        arguments[option_name] = get_option(opt_parameter,
                 test_class.requiredOptions, type=opt_type)
 
     return arguments
@@ -145,7 +107,7 @@ def getArguments(test_class):
 def test_class_name_to_name(test_class_name):
     return test_class_name.lower().replace(' ','_')
 
-def getNetTestInformation(net_test_file):
+def get_net_test_information(net_test_file):
     """
     Returns a dict containing:
 
@@ -158,14 +120,14 @@ def getNetTestInformation(net_test_file):
             values the argument description.
     }
     """
-    test_class = getTestClassFromFile(net_test_file)
+    test_class = get_test_class_from_file(net_test_file)
 
     test_id = os.path.basename(net_test_file).replace('.py', '')
     information = {'id': test_id,
         'name': test_class.name,
         'description': test_class.description,
         'version': test_class.version,
-        'arguments': getArguments(test_class),
+        'arguments': get_arguments(test_class),
         'path': net_test_file,
     }
     return information
@@ -180,13 +142,10 @@ class NetTestLoader(object):
         self.testCases, test_cases = None, None
 
         if test_file:
-            test_cases = loadNetTestFile(test_file)
+            self.loadNetTestFile(test_file)
         elif test_string:
-            test_cases = loadNetTestString(test_string)
+            self.loadNetTestString(test_string)
 
-        if test_cases:
-            self.setupTestCases(test_cases)
-   
     @property
     def requiredTestHelpers(self):
         required_test_helpers = []
@@ -272,13 +231,15 @@ class NetTestLoader(object):
         for input_file in self.inputFiles:
             input_file_hashes.append(input_file['hash'])
 
-        test_details = {'start_time': time.time(),
+        test_details = {
+            'start_time': time.time() + time.timezone,
             'probe_asn': client_geodata['asn'],
             'probe_cc': client_geodata['countrycode'],
             'probe_ip': client_geodata['ip'],
             'probe_city': client_geodata['city'],
             'test_name': self.testName,
             'test_version': self.testVersion,
+            'data_format_version': data_format_version,
             'software_name': 'ooniprobe',
             'software_version': software_version,
             'options': self.options,
