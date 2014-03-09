@@ -439,24 +439,18 @@ DNS based tests
 
 DNS based tests will be a subclass of :class:`ooni.templates.dnst.DNSTest`.
 
-It provides methods :func:`ooni.templates.dnst.DNSTest.performPTRLookup`
-and :func:`ooni.templates.dnst.DNSTest.performALookup`
-
-For example (taken from :mod:`nettests.examples.example_dnst`):
+You can access all the main dns query functions via self.query.
 
 ::
-
+  
+  from twisted.internet import defer
   from ooni.templates.dnst import DNSTest
   
   class ExampleDNSTest(DNSTest):
+      @defer.inlineCallbacks
       def test_a_lookup(self):
-          def gotResult(result):
-              # Result is an array containing all the A record lookup results
-              print result
-  
-          d = self.performALookup('torproject.org', ('8.8.8.8', 53))
-          d.addCallback(gotResult)
-          return d
+          result = yield self.query.a('torproject.org', ('8.8.8.8', 53))
+          result.addresses
 
 Report format
 *************
