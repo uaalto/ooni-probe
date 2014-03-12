@@ -25,7 +25,13 @@ def representAnswer(answer):
 class InvalidProtocol(Exception): pass
 
 class DNSAnswer(object):
-    def 
+    pass
+
+class DNSError(Exception): pass
+
+class InvalidRDType(DNSError): pass
+
+class InvalidRDClass(DNSError): pass
 
 class DNSQuery(object):
     protocol = 'UDP'
@@ -34,7 +40,7 @@ class DNSQuery(object):
     def __init__(self, report):
         self.report = report
     
-    def _query(self, q, dns_server=None):
+    def query(self, qname, rdtype="A", rdclass="IN", dns_server=None):
         def callback(message):
             answers = []
             name = ''
@@ -50,6 +56,17 @@ class DNSQuery(object):
                     query_type = 'PTR', failure=failure)
             return None
 
+        try:
+            rdtype = getattr(dns, rdtype)
+        except AttributeError:
+            raise InvalidRDType
+
+        try:
+            rdclass = getattr(dns, rdclass)
+        except AttributeError:
+            raise InvalidRDClass
+
+        q = [dns.Query(qname, rdtype, rdclass)]
         resolver = Resolver(servers=[dns_server])
         if self.protocol == 'UDP':
             d = resolver.queryUDP(query, timeout=self.timeout)
@@ -62,30 +79,32 @@ class DNSQuery(object):
         return d
 
     def a(self, name, dns_server=None):
-        pass
+        return self.query(name, 'A', 'IN', dns_server)
 
     def aaaa(self, name, dns_server=None):
-        pass
+        return self.query(name, 'AAAA', 'IN', dns_server)
+    
+    def reverse(self, name, dns_server=None):
+        ptr = '.'.join(name.split('.')[::-1]) + '.in-addr.arpa'
+        return self.ptr(ptr, dns_server)
 
     def ptr(self, name, dns_server=None):
-        ptr = '.'.join(name.split('.')[::-1]) + '.in-addr.arpa'
-        q = [dns.Query(ptr, dns.PTR, dns.IN)]
-        self._query(q, dns_server)
+        return self.query(name, 'PTR', 'IN', dns_server)
 
     def ns(self, name, dns_server=None):
-        pass
+        return self.query(name, 'NS', 'IN', dns_server)
 
     def cname(self, name, dns_server=None):
-        pass
+        return self.query(name, 'CNAME', 'IN', dns_server)
 
     def mx(self, name, dns_server=None):
-        pass
+        return self.query(name, 'MX', 'IN', dns_server)
 
     def txt(self, name, dns_server=None):
-        pass
+        return self.query(name, 'TXT', 'IN', dns_server)
 
     def soa(self, name, dns_server=None):
-        pass
+        return self.query(name, 'SOA', 'IN', dns_server)
 
 class DNSTest(NetTestCase):
     name = "Base DNS Test"
