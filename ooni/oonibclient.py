@@ -19,7 +19,7 @@ class Collector(object):
 
         self.nettest_policy = None
         self.input_policy = None
-    
+
     @defer.inlineCallbacks
     def loadPolicy(self):
         # XXX implement caching of policies
@@ -100,7 +100,7 @@ class OONIBClient(object):
         bodyProducer = None
         if query:
             bodyProducer = StringProducer(json.dumps(query))
-        
+
         def genReceiver(finished, content_length):
             def process_response(s):
                 # If empty string then don't parse it.
@@ -125,7 +125,7 @@ class OONIBClient(object):
             return Downloader(download_path, finished, content_length)
 
         return self._request('GET', urn, genReceiver)
-    
+
     def getNettestPolicy(self):
         pass
 
@@ -227,10 +227,10 @@ class OONIBClient(object):
             return d
 
     @defer.inlineCallbacks
-    def lookupTestCollector(self, test_name):
+    def lookupTestCollector(self, net_tests):
         try:
             test_collector = yield self.queryBackend('POST', '/bouncer',
-                    query={'test-collector': test_name})
+                    query={'net-tests': net_tests})
         except Exception:
             raise e.CouldNotFindTestCollector
 
@@ -240,7 +240,7 @@ class OONIBClient(object):
     def lookupTestHelpers(self, test_helper_names):
         try:
 
-            test_helper = yield self.queryBackend('POST', '/bouncer', 
+            test_helper = yield self.queryBackend('POST', '/bouncer',
                             query={'test-helpers': test_helper_names})
         except Exception, exc:
             log.exception(exc)
