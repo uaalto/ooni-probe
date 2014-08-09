@@ -40,6 +40,7 @@ def pcapdnet_installed():
 
         sys.modules['dnet'] = dumbnet
     except ImportError:
+        print "FAILED TO IMPORT DNET"
         pass
 
     try:
