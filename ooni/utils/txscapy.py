@@ -206,7 +206,6 @@ class ScapyFactory(abstract.FileDescriptor):
         else:
             raise ProtocolNotRegistered
 
-
 class ScapyProtocol(object):
     factory = None
 
