@@ -50,6 +50,8 @@ def pcapdnet_installed():
         config.pcap_dnet = True
 
     except ImportError as e:
+        print "FAILED TO IMPORT DNET OR PCAP."
+        print e.message
         log.err(e.message + ". Pypcap or dnet are not properly installed. Certain tests may not work.")
         config.pcap_dnet = False
         conf.use_pcap = False
@@ -62,6 +64,7 @@ def pcapdnet_installed():
         from scapy.arch import pcapdnet
     except ImportError:
         log.err("Your platform requires having libdnet and libpcap installed.")
+        print("Your platform requires having libdnet and libpcap installed.")
         raise LibraryNotInstalledError
 
     return config.pcap_dnet
@@ -71,6 +74,7 @@ if pcapdnet_installed():
     from scapy.all import PcapWriter
 
 else:
+    print "PCAP OR DNET NOT INSTALLED"
     class DummyPcapWriter:
         def __init__(self, pcap_filename, *arg, **kw):
             log.err("Initializing DummyPcapWriter. We will not actually write to a pcapfile")
