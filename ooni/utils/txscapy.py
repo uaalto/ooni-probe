@@ -61,7 +61,7 @@ def pcapdnet_installed():
     try:
         from scapy.arch import pcapdnet
     except ImportError:
-        log.err("Your platform requires to having libdnet and libpcap installed.")
+        log.err("Your platform requires having libdnet and libpcap installed.")
         raise LibraryNotInstalledError
 
     return config.pcap_dnet
