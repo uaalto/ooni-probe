@@ -2,6 +2,7 @@ language: python
 before_install:
   - sudo apt-get install tor libpcap-dev libgeoip-dev python-dumbnet libdumbnet-dev
   - sudo /etc/init.d/tor start
+  - python -c 'import dumbnet; print dumbnet.__file__'
 python:
   - "2.7"
 # command to install dependencies
