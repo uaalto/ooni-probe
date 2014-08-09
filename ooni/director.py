@@ -366,6 +366,7 @@ class Director(object):
                 setattr(tor_config, i, config.tor.torrc[i])
 
         tor_config.User = pwd.getpwuid(os.geteuid()).pw_name
+        print "Launching tor with user %s" % tor_config.User
 
         tor_config.save()
 
