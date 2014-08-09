@@ -78,7 +78,8 @@ class TestRunDirector(ConfigTestCase):
         super(TestRunDirector, self).tearDown()
         for filename in self.filenames:
             if os.path.exists(filename):
-                os.remove(filename)
+                #os.remove(filename)
+                print filename
         self.filenames = []
 
     @defer.inlineCallbacks
@@ -186,4 +187,3 @@ class TestRunDirector(ConfigTestCase):
                               verify_function, ooni_args=['-f', conf_file])
 
         config.scapyFactory.connectionLost('')
-        config.scapyFactory.loseConnection()
