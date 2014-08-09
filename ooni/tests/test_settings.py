@@ -1,6 +1,7 @@
+import os
+import pwd
 import random
 
-from twisted.trial import unittest
 from twisted.internet import defer, reactor
 from twisted.internet.protocol import Protocol, Factory
 from scapy.all import get_if_list
@@ -35,6 +36,7 @@ class TestSettings(ConfigTestCase):
         config = txtorcon.TorConfig()
         config.SocksPort = self.conf.tor.socks_port
         config.ControlPort = self.conf.tor.control_port
+        config.User = pwd.getpwuid(os.geteuid()).pw_name
         d = txtorcon.launch_tor(config, reactor, progress_updates=progress)
         return d
 
