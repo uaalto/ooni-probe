@@ -183,3 +183,4 @@ class TestRunDirector(ConfigTestCase):
                               verify_function, ooni_args=['-f', conf_file])
 
         config.scapyFactory.connectionLost('')
+        config.scapyFactory.loseConnection()
