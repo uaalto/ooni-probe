@@ -40,7 +40,6 @@ def pcapdnet_installed():
 
         sys.modules['dnet'] = dumbnet
     except ImportError:
-        print "FAILED TO IMPORT DNET"
         pass
 
     try:
@@ -51,8 +50,6 @@ def pcapdnet_installed():
         config.pcap_dnet = True
 
     except ImportError as e:
-        print "FAILED TO IMPORT DNET OR PCAP."
-        print e.message
         log.err(e.message + ". Pypcap or dnet are not properly installed. Certain tests may not work.")
         config.pcap_dnet = False
         conf.use_pcap = False
@@ -75,7 +72,7 @@ if pcapdnet_installed():
     from scapy.all import PcapWriter
 
 else:
-    print "PCAP OR DNET NOT INSTALLED"
+
     class DummyPcapWriter:
         def __init__(self, pcap_filename, *arg, **kw):
             log.err("Initializing DummyPcapWriter. We will not actually write to a pcapfile")
@@ -309,10 +306,8 @@ class ScapySender(ScapyProtocol):
 class ScapySniffer(ScapyProtocol):
     def __init__(self, pcap_filename, *arg, **kw):
         self.pcapwriter = PcapWriter(pcap_filename, *arg, **kw)
-        print "Openning %s" % pcap_filename
 
     def packetReceived(self, packet):
-        print "Writing packet.."
         self.pcapwriter.write(packet)
 
     def close(self):
