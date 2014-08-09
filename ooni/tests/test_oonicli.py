@@ -173,7 +173,9 @@ class TestRunDirector(ConfigTestCase):
     @defer.inlineCallbacks
     def test_sniffing_activated(self):
         filename = os.path.abspath('test_report.pcap')
+        print "Writing to pcap file %s" % filename
         self.filenames.append(filename)
+        print self.filenames
         conf_file = os.path.abspath('fake_config.conf')
         with open(conf_file, 'w') as cfg:
             cfg.writelines(config_includepcap)
@@ -185,5 +187,6 @@ class TestRunDirector(ConfigTestCase):
         yield self.run_helper('blocking/http_requests',
                               ['-f', 'example-input.txt'],
                               verify_function, ooni_args=['-f', conf_file])
-
+        print "FOOOOOO---"
+        print self.filenames
         config.scapyFactory.connectionLost('')
