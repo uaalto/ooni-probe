@@ -78,9 +78,7 @@ class TestRunDirector(ConfigTestCase):
         super(TestRunDirector, self).tearDown()
         for filename in self.filenames:
             if os.path.exists(filename):
-                #os.remove(filename)
-                pass
-            print filename
+                os.remove(filename)
         self.filenames = []
 
     @defer.inlineCallbacks
@@ -102,10 +100,7 @@ class TestRunDirector(ConfigTestCase):
                 raise Exception("Missing entry in report")
         verify_header(header)
         verify_entry(first_entry)
-        try:
-            verify_function(first_entry)
-        except:
-            print "FAILED VERIFY FUNCTION!!"
+        verify_function(first_entry)
         sys.argv = oldargv
 
     @defer.inlineCallbacks
