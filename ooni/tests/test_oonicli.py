@@ -2,7 +2,7 @@ import os
 import sys
 import yaml
 
-from twisted.internet import defer, reactor
+from twisted.internet import defer
 
 from ooni.tests import is_internet_connected
 from ooni.tests.bases import ConfigTestCase
@@ -76,14 +76,14 @@ class TestRunDirector(ConfigTestCase):
 
     def tearDown(self):
         super(TestRunDirector, self).tearDown()
-        if len(self.filenames) > 0:
-            for filename in self.filenames:
-                if os.path.exists(filename):
-                    os.remove(filename)
+        for filename in self.filenames:
+            if os.path.exists(filename):
+                os.remove(filename)
+        self.filenames = []
 
     @defer.inlineCallbacks
-    def run_helper(self, test_name, nettest_args, verify_function, ooni_args=[]):
-        output_file = 'test_report.yamloo'
+    def run_helper(self, test_name, nettest_args, verify_function, ooni_args=()):
+        output_file = os.path.abspath('test_report.yamloo')
         self.filenames.append(output_file)
         oldargv = sys.argv
         sys.argv = ['']
@@ -100,7 +100,10 @@ class TestRunDirector(ConfigTestCase):
                 raise Exception("Missing entry in report")
         verify_header(header)
         verify_entry(first_entry)
-        verify_function(first_entry)
+        try:
+            verify_function(first_entry)
+        except:
+            print "FAILED VERIFY FUNCTION!!"
         sys.argv = oldargv
 
     @defer.inlineCallbacks
