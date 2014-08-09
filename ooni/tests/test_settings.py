@@ -31,15 +31,23 @@ class TestSettings(ConfigTestCase):
         def progress(percent, tag, summary):
             ticks = int((percent/100.0) * 10.0)
             prog = (ticks * '#') + ((10 - ticks) * '.')
+            # print ".",
             print '%s %s' % (prog, summary)
 
         config = txtorcon.TorConfig()
         config.SocksPort = self.conf.tor.socks_port
         config.ControlPort = 0
-        if os.geteuid() == 0:
-            #tor_binary = txtorcon.util.find_tor_binary()
-            config.User = pwd.getpwuid(os.stat('/var/run/tor').st_uid).pw_name
+        config.Log = "notice file /tmp/foo.log"
+        # if os.geteuid() == 0:
+        #     #tor_binary = txtorcon.util.find_tor_binary()
+        #     config.User = pwd.getpwuid(os.stat('/var/run/tor').st_uid).pw_name
         d = txtorcon.launch_tor(config, reactor, progress_updates=progress)
+        @d.addErrback
+        def eb(err):
+            print err
+        @d.addCallback
+        def cb(result):
+            print result
         return d
 
     def run_silly_server(self):
