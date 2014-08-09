@@ -79,7 +79,8 @@ class TestRunDirector(ConfigTestCase):
         for filename in self.filenames:
             if os.path.exists(filename):
                 #os.remove(filename)
-                print filename
+                pass
+            print filename
         self.filenames = []
 
     @defer.inlineCallbacks
