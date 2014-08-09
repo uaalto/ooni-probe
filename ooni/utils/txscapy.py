@@ -304,8 +304,10 @@ class ScapySender(ScapyProtocol):
 class ScapySniffer(ScapyProtocol):
     def __init__(self, pcap_filename, *arg, **kw):
         self.pcapwriter = PcapWriter(pcap_filename, *arg, **kw)
+        print "Openning %s" % pcap_filename
 
     def packetReceived(self, packet):
+        print "Writing packet.."
         self.pcapwriter.write(packet)
 
     def close(self):

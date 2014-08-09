@@ -283,7 +283,6 @@ class Director(object):
         self.sniffers[testDetails['test_name']] = sniffer
         config.scapyFactory.registerProtocol(sniffer)
         log.msg("Starting packet capture to: %s" % filename_pcap)
-        print("Starting packet capture to: %s" % filename_pcap)
 
     @defer.inlineCallbacks
     def getTorState(self):
