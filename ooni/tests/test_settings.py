@@ -36,6 +36,9 @@ class TestSettings(ConfigTestCase):
         config = txtorcon.TorConfig()
         config.SocksPort = self.conf.tor.socks_port
         config.ControlPort = 0
+        if os.geteuid() == 0:
+            tor_binary = txtorcon.util.find_tor_binary()
+            config.User = pwd.getpwuid(os.stat(tor_binary).st_uid).pw_name
         d = txtorcon.launch_tor(config, reactor, progress_updates=progress)
         return d
 
