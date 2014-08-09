@@ -40,8 +40,9 @@ class TestSettings(ConfigTestCase):
         #config.ControlPort = 0
         #config.Log = "notice file /tmp/foo.log"
         if os.geteuid() == 0:
-             #tor_binary = txtorcon.util.find_tor_binary()
-             config.User = pwd.getpwuid(os.stat('/var/run/tor').st_uid).pw_name
+            #tor_binary = txtorcon.util.find_tor_binary()
+            #config.User = pwd.getpwuid(os.stat('/var/run/tor').st_uid).pw_name
+            pass
         d = txtorcon.launch_tor(config, reactor, progress_updates=progress)
         # @d.addErrback
         # def eb(err):
